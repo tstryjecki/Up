@@ -1,0 +1,47 @@
+// elements
+h1
+{
+	margin: 10px;
+}
+
+// id
+#container
+{
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+
+}
+#upload
+{
+	background-color: #f0f0f0;
+	padding:20px;
+}
+#dragg
+{	
+	height: 150px;
+	width: 150px;
+	background-color: #f5f5f5;
+	padding:10px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 10px;
+	border: 2px dotted #666666;
+	text-align: center;
+}
+
+#gallery
+{
+	background-color: #b1b1ef;
+	padding:20px;
+}
+
+
+// class
+#thumbnails img {}
+  .thumb {
+    height: 150px;
+    width: 150px;
+    border: 1px solid #000;
+    margin: 10px 5px 0 0;
+  }
