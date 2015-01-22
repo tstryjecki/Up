@@ -57,9 +57,9 @@ var fileUp = (function (filesElement, galleryElement) {
 })('#files', '#gallery');
 
 
-var draggAndDrop = (function(draggElement, galleryElement) {
+var dragAndDrop = (function(dragElement, galleryElement) {
     var conf = {
-        dropZone : document.querySelector(draggElement),
+        dropZone : document.querySelector(dragElement),
         gallery : document.querySelector(galleryElement)
     };
     
@@ -103,4 +103,4 @@ var draggAndDrop = (function(draggElement, galleryElement) {
     return {
 
     };
-})('#dragg', '#gallery');
+})('#drag', '#gallery');
