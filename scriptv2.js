@@ -1,6 +1,55 @@
+var conf = (function (filesElement, dragElement, galleryElement) {
+    var configuration = configuration || {};
+    var config = {
+        fileInput : document.querySelector(filesElement),
+        gallery : document.querySelector(galleryElement),
+        dropZone : document.querySelector(dragElement),
+    }
+
+    Object.keys(config).forEach(function(key) {
+        if (configuration[key]) { config[key] = configuration[key] }
+    });
+
+    return config;
+})('#files', '#drag', '#gallery');
+
+var handleFile = (function (conf) {
+
+
+    function select(evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        var filesHolder;
+        (evt.type == 'drop') ? (filesHolder = evt.dataTransfer.files) : (filesHolder = evt.target.files);
+
+        for (var i = 0, file;
+            (file = filesHolder[i]); i++) {
+            var reader = new FileReader();
+
+            // Only process image files.
+            if (file.type.match("image.*")) {
+
+                reader.onload = function() {
+                    var img = new Image();
+                    img.src = this.result;
+                    //thumbnails
+                    conf.gallery.appendChild(thumbnails.makeCanvas(img, 150, 150));
+                }
+
+                // Read in the image file as a data URL.
+                reader.readAsDataURL(file);
+            }
+        }
+    }
+        return {
+            select: select
+        };
+
+})(conf);
+
+
 var thumbnails = (function() {
-    return {
-        makeCanvas: function makeCanvas(img, width, height) {
+    function makeCanvas(img, width, height) {
             var canvas = document.createElement('canvas'),
                 canvasUrl = document.createElement('a'),
                 ctx = canvas.getContext('2d');
@@ -15,92 +64,39 @@ var thumbnails = (function() {
                 ctx.drawImage(img, 0, 0, width, height);
             };
             return canvasUrl;
-        }
+    }
+    return {
+        makeCanvas: makeCanvas
     }
 })();
 
-var fileUp = (function (filesElement, galleryElement) {
-    var conf = {
-        fileInput : document.querySelector(filesElement),
-        gallery : document.querySelector(galleryElement)
-    };
+var fileUp = (function (conf) {
 
-    //fileInput.onchange 
-    function handleFileSelect(evt) {
-
-        var filesHolder = evt.target.files;
-        for (var i = 0, file;
-            (file = filesHolder[i]); i++) {
-            var reader = new FileReader();
-
-            // Only process image files.
-            if (file.type.match("image.*")) {
-
-                reader.onload = function() {
-                    var img = new Image();
-                    img.src = this.result;
-                    //thumbnails
-                    conf.gallery.appendChild(thumbnails.makeCanvas(img, 150, 150));
-                }
-
-                // Read in the image file as a data URL.
-                reader.readAsDataURL(file);
-            }
-        }
+    function input() {
+        conf.fileInput.addEventListener('change', handleFile.select, false);
     }
-
-    conf.fileInput.addEventListener('change', handleFileSelect, false);
-
     return {
-        
-    };
-})('#files', '#gallery');
+            input:input()    
+        };
+})(conf);
 
 
-var dragAndDrop = (function(dragElement, galleryElement) {
-    var conf = {
-        dropZone : document.querySelector(dragElement),
-        gallery : document.querySelector(galleryElement)
-    };
+var dragAndDrop = (function(dragElement) {
     
-    //files handler
-    function handleFileSelect(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        var filesHolder = evt.dataTransfer.files;
-
-        for (var i = 0, file;
-            (file = filesHolder[i]); i++) {
-            var reader = new FileReader();
-
-            // Only process image files.
-            if (file.type.match("image.*")) {
-
-                reader.onload = function() {
-                    var img = new Image();
-                    img.src = this.result;
-                    //thumbnails
-                    conf.gallery.appendChild(thumbnails.makeCanvas(img, 150, 150));
-                }
-
-                // Read in the image file as a data URL.
-                reader.readAsDataURL(file);
-            }
+    function drag() {
+        function handleDragOver(evt) {
+            evt.stopPropagation();
+            evt.preventDefault();
+            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
         }
-    }
-
-
-    function handleDragOver(evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-    }
     // Setup the dnd listeners.
 
-    conf.dropZone.addEventListener('dragover', handleDragOver, false);
-    conf.dropZone.addEventListener('drop', handleFileSelect, false);
-
-    return {
-
+        conf.dropZone.addEventListener('dragover', handleDragOver, false);
+        conf.dropZone.addEventListener('drop', handleFile.select, false);
     };
-})('#drag', '#gallery');
+
+    
+    return {
+        drag:drag()
+    };
+})(conf);
